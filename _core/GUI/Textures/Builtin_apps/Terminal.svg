@@ -1,0 +1,24 @@
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34" height="27.875" viewBox="0,0,34,27.875">
+  <g transform="translate(-223,-166.0625)">
+    <g data-paper-data='{"isPaintingLayer":true}' fill-rule="nonzero" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" style="mix-blend-mode: normal">
+
+      <g stroke="#000000">
+        <!-- Existing path with filled color -->
+        <path d="M224,188.29167c0,-5.14823 0,-13.12061 0,-16.125c0,-2.27501 2.1514,-5.10416 4.14584,-5.10416c3.83308,0 17.29523,0 24,0c2.33787,0 3.85416,2.66841 3.85416,4.85416c0,2.96885 0,10.89256 0,16.125c0,2.78408 -1.97872,4.89584 -3.85416,4.89584c-3.7163,0 -17.11616,0 -24,0c-2.504,0 -4.14584,-1.92994 -4.14584,-4.64584z" fill="#ffffff" stroke-width="2" stroke-linecap="butt"/>
+        <path d="M224.14584,173.66667h31.5" fill="none" stroke-width="2" stroke-linecap="round"/>
+        <path d="M228,170.625c0,-0.41422 0.33578,-0.75 0.75,-0.75c0.41422,0 0.75,0.33578 0.75,0.75c0,0.41422 -0.33578,0.75 -0.75,0.75c-0.41422,0 -0.75,-0.33578 -0.75,-0.75z" fill="#000000" stroke-width="0.5" stroke-linecap="butt"/>
+        <path d="M231.75,170.625c0,-0.41422 0.33578,-0.75 0.75,-0.75c0.41422,0 0.75,0.33578 0.75,0.75c0,0.41422 -0.33578,0.75 -0.75,0.75c-0.41422,0 -0.75,-0.33578 -0.75,-0.75z" fill="#000000" stroke-width="0.5" stroke-linecap="butt"/>
+        <path d="M235.5,170.625c0,-0.41422 0.33578,-0.75 0.75,-0.75c0.41422,0 0.75,0.33578 0.75,0.75c0,0.41422 -0.33578,0.75 -0.75,0.75c-0.41422,0 -0.75,-0.33578 -0.75,-0.75z" fill="#000000" stroke-width="0.5" stroke-linecap="butt"/>
+      </g>
+
+      <g fill="#000000" stroke="none" stroke-width="1" stroke-linecap="butt" font-family="Sans Serif" font-weight="normal" font-size="40" text-anchor="start">
+        <text transform="translate(233.69678,185.26876) scale(0.29415,0.29415)" font-size="40" xml:space="preserve" fill="#000000" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="Sans Serif" font-weight="normal" text-anchor="start" style="mix-blend-mode: normal">
+          <tspan x="0" dy="0">></tspan>
+        </text>
+        <text transform="translate(241.19678,181.51876) scale(0.29415,0.29415)" font-size="40" xml:space="preserve" fill="#000000" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="Sans Serif" font-weight="normal" text-anchor="start" style="mix-blend-mode: normal">
+          <tspan x="0" dy="0">_</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>
