@@ -1,3 +1,5 @@
+import sys
+
 opcode_map = {
     'NOP': '0x00',
     'LOAD': '0x01',
@@ -57,7 +59,7 @@ class Compile:
             args = tokens[1:]
 
             if cmd not in opcode_map:
-                raise SyntaxError(f"Unknown instruction: {cmd}")
+                raise SyntaxError(f"Unknown instruction: {tokens[0]}")
 
             if cmd == "JUMP":
                 label = args[0]
@@ -74,13 +76,22 @@ class Compile:
     def get_output(self):
         return "\n".join(self.compiled_code)
 
+    def _error(self, error, line):
+        def _perror(string):
+            print(string, file=sys.stderr)
+        line_number
+        _perror(f"Traceback (most recent call last):")
+        _perror(f"  Line {line}, in <module>")
+        _perror(f"  {line}")
+
 
 def main() -> None:
     code = Compile(r"""
     start:
-        JUMP 0x01
+        awd
     """).get_output()
     print(code)
 
 if __name__ == "__main__":
     main()
+
