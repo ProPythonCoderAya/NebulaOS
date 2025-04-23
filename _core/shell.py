@@ -4,7 +4,9 @@ import time
 import json
 import Disk
 import bcrypt
+import string
 import platform
+from pynput import keyboard
 
 
 def run(filepath):
@@ -14,7 +16,9 @@ def run(filepath):
     os.system(" ".join(cmd))
 
 custom_commands = {}
-data = json.load(f"{Disk.disk_name}/commands.cds")
+with open(f"{Disk.disk_name}/commands.cds", "r") as file:
+    data = json.load(file)
+
 if not isinstance(data, dict):
     exit("Traceback (most recent call last):\n  TypeError: commands.cds is not dict styled")
 custom_commands = data
@@ -30,6 +34,7 @@ commands_description = {
     "mode <mode>": "Changes the mode. Example: mode GUI",
     "addusr <name> <passwd>": "Adds a user (must be root to add user)",
     "setmode <key> <value>": "Sets the key to value in the settings",
+    "cmdadd <cmd>": "Makes a custom command (type :wcmd to save)",
     "shutdown": "Shut down NebulaOS"
 }
 command_text = ["", "NebulaOS Restart Commands:"]
@@ -111,6 +116,30 @@ def check_if_dict(obj, error: str = "Expected dict"):
         exit(1)
 
 
+def get_password(prompt="Password: ", mask="•"):
+    print(prompt, end="", flush=True)
+    password = []
+
+    def on_press(key):
+        nonlocal password
+        if key == keyboard.Key.enter:
+            return False  # Stop listener
+        elif key == keyboard.Key.backspace:
+            if password:
+                password.pop()
+                print("\b \b", end="", flush=True)
+        elif hasattr(key, 'char') and key.char:
+            password.append(key.char)
+            time.sleep(0.1)  # Wait for keypress to register
+            print("\b \b", end="", flush=True)  # Delete printed character
+            print(mask, end="", flush=True)  # Replace with mask
+
+    with keyboard.Listener(on_press=on_press) as listener:
+        listener.join()
+
+    return ''.join(password)
+
+
 def login():
     user = input("Username: ").strip()
     check_user_exists(user)
@@ -118,7 +147,7 @@ def login():
         user_data = json.load(file)
     attempts = 3
     while True:
-        password = input("Password: ").strip()
+        password = get_password("Password: ").strip()
         if check_password(user_data["users"][user]["password"], password):
             return user, user_data
         else:
@@ -297,6 +326,29 @@ def nebula_shell():
 
         elif cmd[0] == "help":
             print(command_text)
+
+        elif cmd[0] == "addcmd":
+            if len(cmd) < 2:
+                print("Usage: addcmd <cmd>")
+                continue
+            cmd_name = cmd[1]
+            cmd_code = []
+            print("Please enter code for the custom command, type :wcmd to save")
+            while True:
+                line = input("> ")
+                if line == ":wcmd":
+                    break
+                cmd_code.append(line)
+            with open(Disk.disk_name + "/commands.cds", "r+") as f:
+                data = json.load(f)
+                data[cmd_name] = {
+                    "code": "\n".join(cmd_code)
+                }
+                f.seek(0)
+                json.dump(data, f, indent=4)
+                f.truncate()
+
+            print(f"Added command '{cmd_name}' successfully!")
 
         elif cmd[0] in custom_commands:
             exec(custom_commands[cmd[0]]["code"])
