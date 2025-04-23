@@ -12,7 +12,7 @@ while True:
         if event.type == pygame.QUIT:
             exit()
 
-    win.fill("white")
+    win.fill("black")
 
     WIN.fill((30, 30, 30))
     WIN.draw(win)

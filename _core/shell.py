@@ -45,8 +45,13 @@ command_text = ["", "NebulaOS Restart Commands:"]
 length = max([len(cmd) for cmd, _ in commands_description.items()]) + 2
 for cmd, exp in commands_description.items():
     command_text.append("  " + cmd + (" " * (length - len(cmd))) + "- " + exp)
-command_text.append("")
-command_text = "\n".join(command_text)
+custom_commands_des = {}
+custom_commands_text = ["", "Custom Commands:" if custom_commands else ""]
+for _, data in custom_commands.items():
+    custom_commands_des[data["example"]] = data["description"]
+for cmd, exp in custom_commands_des.items():
+    custom_commands_text.append("  " + cmd + (" " * (length - len(cmd))) + "- " + exp)
+command_text = "\n".join(command_text) + "\n".join(custom_commands_text)
 
 if not os.path.exists(Disk.disk_name):
     sys.stdout = open(os.devnull, "w")
@@ -395,10 +400,26 @@ def nebula_shell():
                 if line == ":wcmd":
                     break
                 cmd_code.append(line)
+            exa = []
+            print("Please enter example usage for the custom command, type :wexa to save")
+            while True:
+                line = input("> ")
+                if line == ":wexa":
+                    break
+                exa.append(line)
+            des = []
+            print("Please enter description for the custom command, type :wdes to save")
+            while True:
+                line = input("> ")
+                if line == ":wdes":
+                    break
+                des.append(line)
             with open(Disk.disk_name + "/commands.cds", "r+") as f:
                 data = json.load(f)
                 data[cmd_name] = {
-                    "code": "\n".join(cmd_code)
+                    "code": "\n".join(cmd_code),
+                    "example": "\n".join(exa),
+                    "description": "\n".join(des)
                 }
                 f.seek(0)
                 json.dump(data, f, indent=4)
