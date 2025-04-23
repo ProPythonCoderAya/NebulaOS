@@ -277,6 +277,8 @@ def exists(path):
             return True
         else:
             return False
+    else:
+        return True
 
 
 def get_root():

@@ -134,7 +134,7 @@ def get_password(prompt="Password: ", mask="•"):
                 print("\b \b", end="", flush=True)
         elif hasattr(key, 'char') and key.char:
             password.append(key.char)
-            time.sleep(0.1)  # Wait for keypress to register
+            time.sleep(0.05)  # Wait for keypress to register and get printed
             print("\b \b", end="", flush=True)  # Delete printed character
             print(mask, end="", flush=True)  # Replace with mask
 
@@ -153,7 +153,7 @@ def login():
     while True:
         password = get_password("Password: ").strip()
         if check_password(user_data["users"][user]["password"], password):
-            return user, user_data
+            return user, user_data["users"][user]
         else:
             attempts -= 1
             if attempts == 0:
@@ -162,6 +162,12 @@ def login():
 
 
 def install_package(package):
+    if Disk.exists(f"/Applications/{package}.neap"):
+        choice = input(
+            f"Package '{package}' already installed. If overwritten would equal updating. Overwrite? (Y/n): ").strip().lower()
+        if choice != "y":
+            print("Installation aborted by user.")
+            return
     base = "https://github.com/ProPythonCoderAya/NamPackages/raw/main/Packages"
     url = f"{base}/{package}.neap.zip"
     print(f"Downloading data from {url} ...")
@@ -171,29 +177,56 @@ def install_package(package):
             print(f"Package '{package}' not found.")
             return
 
+        print("Extracting zip...")
+        dist = f"pkgs/{package}"
         with zipfile.ZipFile(io.BytesIO(response.content)) as z:
-            os.makedirs(f"tmp/{package}", exist_ok=True)
-            z.extractall(f"tmp/{package}")
-        print(f"Installed '{package}' successfully!")
+            os.makedirs(dist, exist_ok=True)
+            z.extractall(dist)
+
+        error = 0
+        for root, dirs, files in os.walk(dist):
+            for file in files:
+                file_path = os.path.join(root, file)
+                relative_path = os.path.relpath(file_path, dist)
+                target_path = os.path.dirname(os.path.join("/Applications", relative_path))
+
+                # Read the file data
+                with open(file_path, "rb") as f:
+                    file_data = f.read()
+
+                # Tell the user that it is writing to the disk.nam
+                print(f"Writing '{file}' to disk...")
+
+                # Write the file data to the virtual disk
+                if not Disk.write_data_to_disk(file, file_data, target_path, overwrite_ok=True):
+                    error = 1
+                    break
+            if error:
+                break
+        else:
+            print(f"Installed '{package}' successfully!")
+            return
+        print(f"Could not install package '{package}'")
 
     except Exception as e:
         print(f"Error installing package: {e}")
 
 
 def nebula_shell():
-    user, _ = login()
+    user, user_data = login()
     if not user:
         print("Sorry, you cannot enter this device.")
         exit(1)
     sign = "#" if user == "root" else "$"
-    current_path = f"/Users/{user}"
+    user_home = user_data["home"]
+    current_path = user_home
     print("Welcome to NebulaOS Restart 🚀")
     print("Type 'help' for commands.\n")
 
     while True:
         path = current_path.split("/")[-1]
 
-        if path == user:
+        if current_path == user_home:
             path = "~"
         if not path:
             path = "/"
@@ -384,7 +417,7 @@ def nebula_shell():
             if command == "install":
                 if len(args) < 2:
                     print("Usage: nam install <package-name>")
-                    return
+                    continue
                 package_name = args[1]
                 install_package(package_name)
 
