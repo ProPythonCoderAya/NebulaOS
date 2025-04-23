@@ -1,6 +1,7 @@
 import json
 import os
 import io
+import sys
 import pygame
 from typing import Literal
 from _core import Disk, GlobalUtils
@@ -11,7 +12,7 @@ class AppRunner:
     class NeapExecutionError(Exception): pass
     class InvalidInstructionError(NeapExecutionError): pass
 
-    def __init__(self, code, cwd, mode: Literal['safe', 'debug', 'normal'] = 'safe'):
+    def __init__(self, code, cwd, mode: Literal['safe', 'debug', 'normal'] = 'safe') -> None:
         self.mode = mode
         self.cwd = cwd
         self.code = code
@@ -22,7 +23,7 @@ class AppRunner:
         for i in range(255):
             self.mem[f"0x{i:02X}"] = 0  # Initialize memory with 255 locations
 
-    def run(self):
+    def run(self, log_file=sys.stderr):
         code = self.code.strip().split('\n')
 
         if code[0] != '!8-bit-code':
@@ -106,7 +107,7 @@ class AppRunner:
 
                 print(message + '\033[0m')  # Make sure to reset color after print
             elif cmd[0] == '0x06':  # HALT
-                print("Program halted.")
+                print("Program halted.", file=log_file)
                 return  # Halt the execution
             elif cmd[0] == '0x07':  # SUB
                 if len(cmd) < 4:
@@ -159,9 +160,9 @@ class AppRunner:
                     raise FileNotFoundError(f"Could not find python file: '{cmd[1]}'")
                 exec(data, {'__name__': '__main__', 'GUI': GUI})
             else:
-                raise self.InvalidInstructionError(f"Unknown instruction '{cmd[0]}'. For you that used `Compile` or `BinaryCompile`, it's ")
+                raise self.InvalidInstructionError(f"Unknown instruction '{cmd[0]}'.")
             pc += 1
-        print("Program Exited without HALT")
+        print("Program Exited without HALT", file=log_file)
 
 
 class AppReader:

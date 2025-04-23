@@ -6,7 +6,7 @@ class BinaryCompile:
     class VersionError(Exception): pass
 
     def __init__(self, asm: str):
-        self.instructions: list[str] = Compile(asm).compiled_code[2:]
+        self.instructions: list[str] = Compile(asm).get_raw()[2:]
         self.compiled_binary = b""
         self.total_instructions = 0
         for instr in self.instructions:
@@ -73,11 +73,9 @@ class BinaryCompile:
 def main() -> None:
     binary = BinaryCompile(r"""
     start:
-        PRINT Hello, world!
-        JUMP loop
-    
-    loop:
-        JUMP loop
+        LOAD r0 0x41
+        PRINT -A \r0
+        HALT
     """)
     binary.save("example.nsb")
 

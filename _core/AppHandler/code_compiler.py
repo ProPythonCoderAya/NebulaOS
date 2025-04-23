@@ -36,7 +36,7 @@ class Compile:
     def __init__(self, asm: str):
         lines = asm.strip().split("\n")
         self.labels = {}
-        label_less = []
+        self.label_less = []
         self.compiled_code = ["!8-bit-code", ""]
 
         # First pass: collect labels and clean up lines
@@ -49,17 +49,17 @@ class Compile:
                 label_name = line.replace(":", "").strip()
                 self.labels[label_name] = current_address
             else:
-                label_less.append(line)
+                self.label_less.append(line)
                 current_address += 1
 
         # Second pass: compile
-        for line in label_less:
+        for line in self.label_less:
             tokens = line.strip().split()
             cmd = tokens[0].upper()
             args = tokens[1:]
 
             if cmd not in opcode_map:
-                raise SyntaxError(f"Unknown instruction: {tokens[0]}")
+                self._error(f"Unknown instruction '{tokens[0]}'", "SyntaxError", line)
 
             if cmd == "JUMP":
                 label = args[0]
@@ -67,7 +67,7 @@ class Compile:
                     if ishex(label):
                         self.compiled_code.append(f"{opcode_map[cmd]} 0x{int(label, 16):02X}")
                         continue
-                    raise ValueError(f"Unknown label: {label}")
+                    self._error(f"Unknown label {label}", "UnknownError", line)
                 addr = self.labels[label] + 1  # Add one because the first line starts at 1
                 self.compiled_code.append(f"{opcode_map[cmd]} 0x{addr:02X}")
             else:
@@ -76,22 +76,36 @@ class Compile:
     def get_output(self):
         return "\n".join(self.compiled_code)
 
-    def _error(self, error, line):
+    def get_raw(self) -> list[str]:
+        return self.compiled_code
+
+    def _error(self, error, error_type, line):
         def _perror(string):
             print(string, file=sys.stderr)
-        line_number
+        line_number = self.label_less.index(line) + 1
         _perror(f"Traceback (most recent call last):")
-        _perror(f"  Line {line}, in <module>")
-        _perror(f"  {line}")
+        _perror(f"  Line {line_number}, in <module>")
+        _perror(f"    {line}")
+        _perror(f"    {'^' * len(line)}")
+        _perror(f"{error_type}: {error}")
+        exit(1)
 
 
 def main() -> None:
     code = Compile(r"""
     start:
-        awd
+        JUMP 0x02
+        JUMP start
+        awd awd
     """).get_output()
     print(code)
 
 if __name__ == "__main__":
     main()
 
+__all__ = [
+    "ishex",
+    "Compile",
+    "opcode_map",
+    "reversed_opcode_map"
+]

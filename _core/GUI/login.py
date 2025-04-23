@@ -64,7 +64,6 @@ BLACK = (0, 0, 0)
 # Other
 clock = pygame.time.Clock()
 
-
 def login():
     # Check if remember me is set
     name = ""
