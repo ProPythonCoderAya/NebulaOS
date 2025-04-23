@@ -81,7 +81,7 @@ def draw(pos):
     x, y = 10, 10
     for app_name, _ in apps.items():
         app_path = f"/Applications/{app_name}"
-        app_image = AppReader.get_image(AppReader, app_path)
+        app_image = AppReader.get_image(app_path)
         WIN.blit(app_image, (x, y))
         x += app_image.get_width() + 5
         y += app_image.get_height() + 5
@@ -89,6 +89,8 @@ def draw(pos):
             cursor = "Hand"
             if pygame.mouse.get_pressed()[0]:
                 cursor = "Drag"
+                app = AppReader(app_path)
+                app.run()
 
     # Clock
     current_time = time.strftime("%H:%M")

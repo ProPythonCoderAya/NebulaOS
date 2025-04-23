@@ -1,11 +1,14 @@
 import os
+import io
 import sys
 import time
 import json
 import Disk
 import bcrypt
 import string
+import zipfile
 import platform
+import requests
 from pynput import keyboard
 
 
@@ -35,6 +38,7 @@ commands_description = {
     "addusr <name> <passwd>": "Adds a user (must be root to add user)",
     "setmode <key> <value>": "Sets the key to value in the settings",
     "cmdadd <cmd>": "Makes a custom command (type :wcmd to save)",
+    "nam <option> [package]": "Installs, lists, etc all the Nebula Apps",
     "shutdown": "Shut down NebulaOS"
 }
 command_text = ["", "NebulaOS Restart Commands:"]
@@ -155,6 +159,25 @@ def login():
             if attempts == 0:
                 return None, None
             print(f"Wrong password, you have {attempts} attempt{'s' if attempts != 1 else ''} left.")
+
+
+def install_package(package):
+    base = "https://github.com/ProPythonCoderAya/NamPackages/raw/main/Packages"
+    url = f"{base}/{package}.neap.zip"
+    print(f"Downloading data from {url} ...")
+    try:
+        response = requests.get(url)
+        if response.status_code != 200:
+            print(f"Package '{package}' not found.")
+            return
+
+        with zipfile.ZipFile(io.BytesIO(response.content)) as z:
+            os.makedirs(f"tmp/{package}", exist_ok=True)
+            z.extractall(f"tmp/{package}")
+        print(f"Installed '{package}' successfully!")
+
+    except Exception as e:
+        print(f"Error installing package: {e}")
 
 
 def nebula_shell():
@@ -349,6 +372,33 @@ def nebula_shell():
                 f.truncate()
 
             print(f"Added command '{cmd_name}' successfully!")
+
+        elif cmd[0] == "nam":
+            args = cmd[1:]
+            if not args:
+                print("Usage: nam <install|list|help> [package-name]")
+                continue
+
+            command = args[0]
+
+            if command == "install":
+                if len(args) < 2:
+                    print("Usage: nam install <package-name>")
+                    return
+                package_name = args[1]
+                install_package(package_name)
+
+            elif command == "list":
+                print("Listing packages coming soon...")
+
+            elif command == "help":
+                print("Nam Package Manager Commands:")
+                print("  nam install <package> - Install a package")
+                print("  nam list              - List installed packages")
+                print("  nam help              - Show this help message")
+
+            else:
+                print(f"Unknown command: {command}")
 
         elif cmd[0] in custom_commands:
             exec(custom_commands[cmd[0]]["code"])

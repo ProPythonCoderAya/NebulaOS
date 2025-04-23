@@ -1,5 +1,7 @@
+import os
 from _core.AppHandler import opcode_map, reversed_opcode_map, Compile, AppReader, AppRunner
 from _core import Disk
+import datetime
 
 
 class BinaryCompile:
@@ -83,7 +85,11 @@ def main() -> None:
     code = BinaryCompile.load("example.nsb", readable_by_AppReader=True)
     Disk.load()
     app = AppRunner(code, "/")
-    app.run()
+    current_time = datetime.datetime.now()
+    logfile = f"{current_time.strftime('%Y-%m-%d--%H:%M:%S')}.log"
+    os.system(f"mkdir -p ~/.nebulaos ; touch ~/.nebulaos/{logfile}")
+    with open(f"/Users/VICKY/.nebulaos/{logfile}", "w") as log:
+        app.run(log_file=log)
 
 if __name__ == "__main__":
     main()

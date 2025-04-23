@@ -155,7 +155,10 @@ class AppRunner:
             elif cmd[0] == '0x10':  # EXPY
                 if len(cmd) < 2:
                     raise TypeError("EXPY not given enough arguments")
-                data = Disk.read_data_from_disk(cmd[1], self.cwd)
+                if cmd[1].startswith("/"):
+                    data = Disk.read_data_from_disk(os.path.basename(cmd[1]), os.path.dirname(cmd[1]))
+                else:
+                    data = Disk.read_data_from_disk(cmd[1], self.cwd)
                 if not data:
                     raise FileNotFoundError(f"Could not find python file: '{cmd[1]}'")
                 exec(data, {'__name__': '__main__', 'GUI': GUI})
@@ -169,15 +172,17 @@ class AppReader:
     class NeapExecutionError(Exception): pass
     class InvalidInstructionError(NeapExecutionError): pass
 
-    def __init__(self, app_path, mode: Literal['safe', 'debug', 'normal'] = 'safe'):
+    def __init__(self, app_path, mode: Literal['safe', 'debug', 'normal'] = 'safe', log_file=sys.stderr):
         self.mode = mode
         self.files = app_path + '/Files/'
         self.exe = self.files + 'Executable/' + os.path.basename(app_path).split('.')[0]
         self.resources = self.files + 'Resources/'
         self.info = self.files + 'Info.prop'
         self.image = self.get_image(app_path)
+        self.log_file = log_file
 
-    def get_image(self, app_path):
+    @staticmethod
+    def get_image(app_path):
         files = app_path + '/Files/'
         resources = files + 'Resources/'
         data = Disk.read_data_from_disk("Info.prop", files)
@@ -200,20 +205,16 @@ class AppReader:
         if not exe_code:
             raise FileNotFoundError("Executable not found")
         app = AppRunner(exe_code, self.files + "Executable", self.mode)
-        app.run()
+        app.run(log_file=self.log_file)
 
 
 def main() -> None:
     Disk.load()
     app = AppRunner(r"""!8-bit-code
 
-0x01 r0 0x41
-0x05 -A \r0
-0x01 r0 0x42
-0x05 -A \r0
-0x01 r0 0x43
-0x05 -A \r0
-""", "/")
+0x10 terminal-main.py
+0x06
+""", "/Applications/Terminal.neap/Files/Resources")
     app.run()
 
 if __name__ == "__main__":
