@@ -23,7 +23,7 @@ class AppRunner:
         for i in range(255):
             self.mem[f"0x{i:02X}"] = 0  # Initialize memory with 255 locations
 
-    def run(self, log_file=sys.stderr):
+    def run(self, log_file=sys.stderr, user: str = "root"):
         code = self.code.strip().split('\n')
 
         if code[0] != '!8-bit-code':
@@ -161,7 +161,7 @@ class AppRunner:
                     data = Disk.read_data_from_disk(cmd[1], self.cwd)
                 if not data:
                     raise FileNotFoundError(f"Could not find python file: '{cmd[1]}'")
-                exec(data, {'__name__': '__main__', 'GUI': GUI})
+                exec(data, {'__name__': '__main__', 'GUI': GUI, 'user': user})
             else:
                 raise self.InvalidInstructionError(f"Unknown instruction '{cmd[0]}'.")
             pc += 1
@@ -185,7 +185,9 @@ class AppReader:
     def get_image(app_path):
         files = app_path + '/Files/'
         resources = files + 'Resources/'
+        Disk.list_contents(files)
         data = Disk.read_data_from_disk("Info.prop", files)
+        print(data)
         data = json.loads(data)
         if not isinstance(data, dict):
             raise TypeError("Info.prop is not dict styled.")

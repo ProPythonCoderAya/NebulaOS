@@ -18,40 +18,47 @@ def run(filepath):
     ]
     os.system(" ".join(cmd))
 
-custom_commands = {}
-with open(f"{Disk.disk_name}/commands.cds", "r") as file:
-    data = json.load(file)
 
-if not isinstance(data, dict):
-    exit("Traceback (most recent call last):\n  TypeError: commands.cds is not dict styled")
-custom_commands = data
+def generate_help_text():
+    global custom_commands
+    with open(f"{Disk.disk_name}/commands.cds", "r") as file:
+        data = json.load(file)
 
-commands_description = {
-    "help": "Prints all the commands",
-    "ls": "List directory contents",
-    "cd <dir>": "Change directory",
-    "mkdir <name>": "Create directory",
-    "open <file>": "Edit or create a file (type :wq to save)",
-    "cat <file>": "Show file contents",
-    "printf <text>": "Prints text",
-    "mode <mode>": "Changes the mode. Example: mode GUI",
-    "addusr <name> <passwd>": "Adds a user (must be root to add user)",
-    "setmode <key> <value>": "Sets the key to value in the settings",
-    "cmdadd <cmd>": "Makes a custom command (type :wcmd to save)",
-    "nam <option> [package]": "Installs, lists, etc all the Nebula Apps",
-    "shutdown": "Shut down NebulaOS"
-}
-command_text = ["", "NebulaOS Restart Commands:"]
-length = max([len(cmd) for cmd, _ in commands_description.items()]) + 2
-for cmd, exp in commands_description.items():
-    command_text.append("  " + cmd + (" " * (length - len(cmd))) + "- " + exp)
-custom_commands_des = {}
-custom_commands_text = ["", "Custom Commands:" if custom_commands else ""]
-for _, data in custom_commands.items():
-    custom_commands_des[data["example"]] = data["description"]
-for cmd, exp in custom_commands_des.items():
-    custom_commands_text.append("  " + cmd + (" " * (length - len(cmd))) + "- " + exp)
-command_text = "\n".join(command_text) + "\n".join(custom_commands_text)
+    if not isinstance(data, dict):
+        exit("Traceback (most recent call last):\n  TypeError: commands.cds is not dict styled")
+    custom_commands = data
+
+    commands_description = {
+        "help": "Prints all the commands",
+        "ls": "List directory contents",
+        "cd <dir>": "Change directory",
+        "mkdir <name>": "Create directory",
+        "open <file>": "Edit or create a file (type :wq to save)",
+        "cat <file>": "Show file contents",
+        "printf <text>": "Prints text",
+        "mode <mode>": "Changes the mode. Example: mode GUI",
+        "addusr <name> <passwd>": "Adds a user (must be root to add user)",
+        "setmode <key> <value>": "Sets the key to value in the settings",
+        "cmdadd <cmd>": "Makes a custom command (type :wcmd to save)",
+        "nam <option> [package]": "Installs, lists, etc all the Nebula Apps",
+        "shutdown": "Shut down NebulaOS"
+    }
+    command_text = ["", "NebulaOS Restart Commands:"]
+    length = max([len(cmd) for cmd, _ in commands_description.items()]) + 2
+    for cmd, exp in commands_description.items():
+        command_text.append("  " + cmd + (" " * (length - len(cmd))) + "- " + exp)
+    custom_commands_des = {}
+    custom_commands_text = [""]
+    if custom_commands:
+        custom_commands_text.append("Custom Commands:")
+    for _, data in custom_commands.items():
+        custom_commands_des[data["example"]] = data["description"]
+    for cmd, exp in custom_commands_des.items():
+        custom_commands_text.append("  " + cmd + (" " * (length - len(cmd))) + "- " + exp)
+    return "\n".join(command_text) + "\n" + "\n".join(custom_commands_text) + ("\n" if custom_commands else "")
+
+global command_text
+command_text = generate_help_text()
 
 if not os.path.exists(Disk.disk_name):
     sys.stdout = open(os.devnull, "w")
@@ -190,6 +197,9 @@ def install_package(package):
 
         error = 0
         for root, dirs, files in os.walk(dist):
+            for dir in dirs:
+                if not Disk.exists(dir):
+                    Disk.create_directory(dir)
             for file in files:
                 file_path = os.path.join(root, file)
                 relative_path = os.path.relpath(file_path, dist)
@@ -210,6 +220,16 @@ def install_package(package):
                 break
         else:
             print(f"Installed '{package}' successfully!")
+            for root, dirs, files in os.walk(dist, topdown=False):
+                # Delete files
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    os.remove(file_path)  # Remove the file
+
+                # Delete directories
+                for dir in dirs:
+                    dir_path = os.path.join(root, dir)
+                    os.rmdir(dir_path)  # Remove the directory
             return
         print(f"Could not install package '{package}'")
 
@@ -218,6 +238,7 @@ def install_package(package):
 
 
 def nebula_shell():
+    global command_text
     user, user_data = login()
     if not user:
         print("Sorry, you cannot enter this device.")
@@ -235,7 +256,8 @@ def nebula_shell():
             path = "~"
         if not path:
             path = "/"
-        cmd = input(f"(base) {platform.node().split('.')[0]}:{path} {user}{sign} ").strip().split()
+        print(f"(base) {platform.node().split('.')[0]}:{path} {user}{sign} ", end="")
+        cmd = input().strip().split()
 
         if not cmd:
             continue
@@ -426,6 +448,7 @@ def nebula_shell():
                 f.truncate()
 
             print(f"Added command '{cmd_name}' successfully!")
+            command_text = generate_help_text()
 
         elif cmd[0] == "nam":
             args = cmd[1:]

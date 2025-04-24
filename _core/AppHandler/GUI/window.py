@@ -17,11 +17,17 @@ class Window(pygame.Surface):
         # Set the window background
         self.fill((30, 30, 30))  # Default window content color
 
+    def blit(self, source, dest, area=None, special_flags: int = 0):
+        pygame.Surface.blit(self, source=source, dest=(dest[0], dest[1] + self._bar_height), area=area, special_flags=special_flags)
+
+    def _blit(self, source, dest, area=None, special_flags: int = 0):
+        pygame.Surface.blit(self, source=source, dest=dest, area=area, special_flags=special_flags)
+
     def draw(self, parent_surface):
         # Replace the title bar area with transparent pixels
         titlebar_area = pygame.Surface((self._rect.width, self._bar_height), pygame.SRCALPHA)
         titlebar_area.fill((0, 0, 0))  # Transparent surface
-        self.blit(titlebar_area, (0, 0))
+        self._blit(titlebar_area, (0, 0))
         self.set_colorkey((0, 0, 0))
 
         # Redraw the title bar
@@ -33,7 +39,7 @@ class Window(pygame.Surface):
         # Title text
         font = pygame.font.SysFont("Courier New", 16)
         title_text = font.render(self._title, True, (255, 255, 255))
-        self.blit(title_text, (10, 5))
+        self._blit(title_text, (10, 5))
 
         # Blit the window onto the main screen
         parent_surface.blit(self, self._rect.topleft)
