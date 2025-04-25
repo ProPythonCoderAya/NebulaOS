@@ -1,4 +1,3 @@
 {
-    "default_mode": "Shell",
-    "remember_me": "Ayaan"
+    "default_mode": "Shell"
 }

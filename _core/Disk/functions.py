@@ -16,7 +16,8 @@ def format_disk_image():
     global superblock
     if not os.path.exists(disk_name):
         os.makedirs(disk_name, exist_ok=True)
-        open(disk_name + "/root.rf", "wb").close()  # This is how I make files (I know its kinda stupid).
+        with open(disk_name + "/root.rf", "w") as root:
+            json.dump(superblock, root, indent=4)
         with open(disk_name + "/usr.ur", "w") as usr:
             a = {
                 "users": {
@@ -29,6 +30,9 @@ def format_disk_image():
                 "default_mode": "Shell"
             }
             json.dump(a, settings, indent=4)
+        with open(disk_name + "/commands.cds", "w") as commands:
+            a = {}
+            json.dump(a, commands)
     with open(disk_name + "/data.img", "wb") as disk:
         disk.write(bytearray(disk_size))  # Write zeroes to initialize
     superblock["root"]["contents"] = {}  # Reset directory structure

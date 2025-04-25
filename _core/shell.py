@@ -57,8 +57,82 @@ def generate_help_text():
         custom_commands_text.append("  " + cmd + (" " * (length - len(cmd))) + "- " + exp)
     return "\n".join(command_text) + "\n" + "\n".join(custom_commands_text) + ("\n" if custom_commands else "")
 
-global command_text
-command_text = generate_help_text()
+
+def install_package(package):
+    if Disk.exists(f"/Applications/{package}.neap"):
+        choice = input(
+            f"Package '{package}' already installed. If overwritten would equal updating. Overwrite? (Y/n): ").strip().lower()
+        if choice != "y":
+            print("Installation aborted by user.")
+            return
+    base = "https://github.com/ProPythonCoderAya/NamPackages/raw/main"
+    url = f"{base}/Packages/{package}.neap.zip"
+    print(f"Downloading data from {url} ...")
+    try:
+        packages = requests.get(f"{base}/packages.json")
+        if packages.status_code != 200:
+            print(f"Error during retrieving packages.json. Status code: {packages.status_code}")
+            return
+        packages = eval(packages.content)
+        if not package in packages:
+            print(f"Package '{package}' not found.")
+            return
+
+        response = requests.get(url)
+        if response.status_code != 200:
+            print(f"Error during download. Status code: {response.status_code}")
+            return
+
+        print("Extracting zip...")
+        dist = f"pkgs/{package}"
+        with zipfile.ZipFile(io.BytesIO(response.content)) as z:
+            os.makedirs(dist, exist_ok=True)
+            z.extractall(dist)
+
+        error = 0
+        if not Disk.exists(f"/Applications/{package}.neap"):
+            Disk.create_directory(f"/Applications/{package}.neap")
+        for root, dirs, files in os.walk(dist):
+            print(root, dirs, files)
+            for dir in dirs:
+                if not Disk.exists(dir):
+                    Disk.create_directory(dir)
+            for file in files:
+                file_path = os.path.join(root, file)
+                relative_path = os.path.relpath(file_path, dist)
+                target_path = os.path.dirname(os.path.join("/Applications", relative_path))
+
+                # Read the file data
+                with open(file_path, "rb") as f:
+                    file_data = f.read()
+
+                # Tell the user that it is writing to the disk.nam
+                print(f"Writing '{file}' to disk...")
+
+                # Write the file data to the virtual disk
+                if not Disk.write_data_to_disk(file, file_data, target_path, overwrite_ok=True):
+                    error = 1
+                    break
+            if error:
+                break
+        else:
+            print(f"Installed '{package}' successfully!")
+            for root, dirs, files in os.walk(dist, topdown=False):
+                # Delete files
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    os.remove(file_path)  # Remove the file
+
+                # Delete directories
+                for dir in dirs:
+                    dir_path = os.path.join(root, dir)
+                    os.rmdir(dir_path)  # Remove the directory
+            return
+        print(f"Could not install package '{package}'")
+
+    except Exception as e:
+        print(f"Error installing package: {e}")
+
 
 if not os.path.exists(Disk.disk_name):
     sys.stdout = open(os.devnull, "w")
@@ -66,38 +140,13 @@ if not os.path.exists(Disk.disk_name):
     Disk.create_directory("/Users")
     Disk.create_directory("/Users/root")
     Disk.create_directory("/Applications")
-    Disk.create_directory("/Applications/Terminal.neap")
-    Disk.create_directory("/Applications/Terminal.neap/")
-    Disk.create_directory("/Applications/Terminal.neap/Files")
-    Disk.create_directory("/Applications/Terminal.neap/Files/Executable")
-    Disk.write_data_to_disk("Terminal",
-                            b"""!8-bit-code
-
-0x10 terminal-main.py
-                            """,
-                            "/Applications/Terminal.neap/Files/Executable")
-    Disk.create_directory("/Applications/Terminal.neap/Files/Resources")
-    Disk.write_data_to_disk("terminal-main.py",
-                            b"""#/usr/local/bin/python3
-
-print("Terminal run!")
-
-                            """,
-                            "/Applications/Terminal.neap/Files/Resources")
-    Disk.write_data_to_disk("Terminal.svg", open("GUI/Textures/Builtin_apps/Terminal.svg", "rb").read(),
-                            "/Applications/Terminal.neap/Files/Resources")
-    Disk.write_data_to_disk("Info.prop",
-                            b"""{
-    "name": "Terminal",
-    "version": "3.0",
-    "author": "Nebula",
-    "description": "Terminal",
-    "image": "Terminal.svg"
-}""",
-                            "/Applications/Terminal.neap/Files")
+    install_package("Terminal")
     sys.stdout = sys.__stdout__
 else:
     Disk.load()
+
+global command_text
+command_text = generate_help_text()
 
 
 def check_user_exists(user):
@@ -171,70 +220,6 @@ def login():
             if attempts == 0:
                 return None, None
             print(f"Wrong password, you have {attempts} attempt{'s' if attempts != 1 else ''} left.")
-
-
-def install_package(package):
-    if Disk.exists(f"/Applications/{package}.neap"):
-        choice = input(
-            f"Package '{package}' already installed. If overwritten would equal updating. Overwrite? (Y/n): ").strip().lower()
-        if choice != "y":
-            print("Installation aborted by user.")
-            return
-    base = "https://github.com/ProPythonCoderAya/NamPackages/raw/main/Packages"
-    url = f"{base}/{package}.neap.zip"
-    print(f"Downloading data from {url} ...")
-    try:
-        response = requests.get(url)
-        if response.status_code != 200:
-            print(f"Package '{package}' not found.")
-            return
-
-        print("Extracting zip...")
-        dist = f"pkgs/{package}"
-        with zipfile.ZipFile(io.BytesIO(response.content)) as z:
-            os.makedirs(dist, exist_ok=True)
-            z.extractall(dist)
-
-        error = 0
-        for root, dirs, files in os.walk(dist):
-            for dir in dirs:
-                if not Disk.exists(dir):
-                    Disk.create_directory(dir)
-            for file in files:
-                file_path = os.path.join(root, file)
-                relative_path = os.path.relpath(file_path, dist)
-                target_path = os.path.dirname(os.path.join("/Applications", relative_path))
-
-                # Read the file data
-                with open(file_path, "rb") as f:
-                    file_data = f.read()
-
-                # Tell the user that it is writing to the disk.nam
-                print(f"Writing '{file}' to disk...")
-
-                # Write the file data to the virtual disk
-                if not Disk.write_data_to_disk(file, file_data, target_path, overwrite_ok=True):
-                    error = 1
-                    break
-            if error:
-                break
-        else:
-            print(f"Installed '{package}' successfully!")
-            for root, dirs, files in os.walk(dist, topdown=False):
-                # Delete files
-                for file in files:
-                    file_path = os.path.join(root, file)
-                    os.remove(file_path)  # Remove the file
-
-                # Delete directories
-                for dir in dirs:
-                    dir_path = os.path.join(root, dir)
-                    os.rmdir(dir_path)  # Remove the directory
-            return
-        print(f"Could not install package '{package}'")
-
-    except Exception as e:
-        print(f"Error installing package: {e}")
 
 
 def nebula_shell():
@@ -502,6 +487,7 @@ def main() -> None:
                     nebula_shell()
             else:
                 nebula_shell()
+            Disk.save()
     except KeyboardInterrupt:
         Disk.save()
         print("\nExited NebulaOS")

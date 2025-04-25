@@ -1,0 +1,7 @@
+{
+    "name": "Terminal",
+    "version": "1.0.0",
+    "author": "NebulaOS Company",
+    "description": "Terminal",
+    "image": "Terminal.svg"
+}

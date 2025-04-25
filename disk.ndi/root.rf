@@ -8,22 +8,22 @@
         false,
         false,
         false,
+        false,
+        false,
         true,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
         true,
         true,
         true,
@@ -1034,20 +1034,11 @@
             "Users": {
                 "type": "dir",
                 "contents": {
-                    "Ayaan": {
-                        "type": "dir",
-                        "contents": {
-                            "Desktop": {
-                                "type": "dir",
-                                "contents": {}
-                            },
-                            "Downloads": {
-                                "type": "dir",
-                                "contents": {}
-                            }
-                        }
-                    },
                     "root": {
+                        "type": "dir",
+                        "contents": {}
+                    },
+                    "Ayaan": {
                         "type": "dir",
                         "contents": {}
                     }
@@ -1059,51 +1050,6 @@
                     "Terminal.neap": {
                         "type": "dir",
                         "contents": {
-                            "Files": {
-                                "type": "dir",
-                                "contents": {
-                                    "Executable": {
-                                        "type": "dir",
-                                        "contents": {
-                                            "Terminal": {
-                                                "type": "file",
-                                                "start": 6,
-                                                "size": 41,
-                                                "blocks": 1
-                                            }
-                                        }
-                                    },
-                                    "Resources": {
-                                        "type": "dir",
-                                        "contents": {
-                                            "terminal-main.py": {
-                                                "type": "file",
-                                                "start": 7,
-                                                "size": 23,
-                                                "blocks": 1
-                                            },
-                                            "Terminal.svg": {
-                                                "type": "file",
-                                                "start": 2,
-                                                "size": 2741,
-                                                "blocks": 3
-                                            }
-                                        }
-                                    },
-                                    "Info.prop": {
-                                        "type": "file",
-                                        "start": 20,
-                                        "size": 95,
-                                        "blocks": 1
-                                    },
-                                    ".DS_Store": {
-                                        "type": "file",
-                                        "start": 1,
-                                        "size": 6148,
-                                        "blocks": 7
-                                    }
-                                }
-                            },
                             ".DS_Store": {
                                 "type": "file",
                                 "start": 0,
@@ -1113,8 +1059,24 @@
                         }
                     }
                 }
+            },
+            "Terminal.neap": {
+                "type": "dir",
+                "contents": {}
+            },
+            "Files": {
+                "type": "dir",
+                "contents": {}
+            },
+            "Executable": {
+                "type": "dir",
+                "contents": {}
+            },
+            "Resources": {
+                "type": "dir",
+                "contents": {}
             }
         }
     },
-    "current_dir": "/Users/Ayaan/Desktop"
+    "current_dir": "/"
 }
