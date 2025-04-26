@@ -470,6 +470,30 @@ def nebula_shell():
 
 
 def main() -> None:
+    logo = [
+        r"|\    |  ╔------  ╔------    |     |  |        ╔-----╗       ╔-----╗   /------ ",
+        r"| \   |  |        |       |  |     |  |        |     |       |     |  |        ",
+        r"|  \  |  |------  |------|   |     |  |        |_____|       |     |   \-----\ ",
+        r"|   \ |  |        |       |  |     |  |        |     |       |     |          |",
+        r"|    \|  ╚------  ╚------    ╚_____╝  ╚______  |     |       ╚_____╝   ______/ ",
+    ]
+
+    # 1. Print logo slowly
+    for line in logo:
+        for char in line:
+            print(char, end="", flush=True)
+            time.sleep(0.01)
+        print()
+
+    time.sleep(1)
+
+    # 2. Erase logo line-by-line
+    for _ in logo:
+        sys.stdout.write("\033[F")  # Move cursor up one line
+        sys.stdout.write("\r")  # Go to start of line
+        sys.stdout.write(" " * 120)  # Clear the line
+        sys.stdout.write("\r")  # Return again
+        sys.stdout.flush()
     try:
         with open(Disk.disk_name + "/settings.st") as file:
             data = json.load(file)

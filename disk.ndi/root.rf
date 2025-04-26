@@ -3,13 +3,6 @@
     "used_blocks": 0,
     "block_size": 1024,
     "free_block_map": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
         true,
         true,
         true,
@@ -17,6 +10,13 @@
         true,
         true,
         true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
         true,
         true,
         true,
@@ -1052,7 +1052,7 @@
                         "contents": {
                             ".DS_Store": {
                                 "type": "file",
-                                "start": 0,
+                                "start": 7,
                                 "size": 6148,
                                 "blocks": 7
                             }
