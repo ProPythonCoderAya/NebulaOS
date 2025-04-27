@@ -288,6 +288,74 @@ def exists(path):
 def get_root():
     return superblock["root"]
 
+
+def walk(top="/", topdown=True):
+    """
+    Custom implementation of os.walk using the custom disk structure.
+
+    Args:
+        top (str): The root directory to start walking from (default is "/").
+        topdown (bool): Whether to traverse directories top-down or bottom-up (default is True).
+
+    Yields:
+        3-tuple (dirpath, dirnames, filenames):
+            - dirpath: Current directory path (string).
+            - dirnames: List of subdirectories in current directory (list of strings).
+            - filenames: List of non-directory files in current directory (list of strings).
+    """
+
+    global superblock
+    # Ensure the `top` is in the correct format (strip leading slashes)
+    parts = top.strip("/").split("/") if top != "/" else []
+
+    # Start from the root directory
+    current = superblock["root"]
+
+    # Traverse the directories to reach the requested path
+    for part in parts:
+        if part in current["contents"] and current["contents"][part]["type"] == "dir":
+            current = current["contents"][part]
+        else:
+            print(f"Error: Directory '{top}' not found.")
+            return
+
+    # Now we are at the requested directory, let's walk it
+    dirs_to_visit = [(current, "")]  # Initialize with the current directory, and the relative path
+    visited = set()  # To keep track of directories we've visited for bottom-up traversal
+
+    while dirs_to_visit:
+        dir_info, relative_path = dirs_to_visit.pop()
+
+        # Gather the subdirectories and files
+        subdirs = [name for name, info in dir_info["contents"].items() if info["type"] == "dir"]
+        files = [name for name, info in dir_info["contents"].items() if info["type"] == "file"]
+
+        # If topdown=True, we yield the current directory's info first
+        if topdown:
+            yield relative_path, subdirs, files
+
+        # If topdown=False, we defer yielding until after subdirectories are processed
+        if not topdown and relative_path not in visited:
+            visited.add(relative_path)  # Mark this directory as visited
+            # Traverse subdirectories first
+            for subdir in subdirs:
+                subdir_info = dir_info["contents"][subdir]
+                subdir_path = relative_path + "/" + subdir
+                dirs_to_visit.append((subdir_info, subdir_path))
+
+        # Yield the current directory's information after visiting subdirectories (bottom-up)
+        if not topdown and relative_path not in visited:
+            visited.add(relative_path)  # Mark this directory as visited
+            yield relative_path, subdirs, files
+
+        # Traverse subdirectories if topdown=True
+        if topdown:
+            for subdir in subdirs:
+                subdir_info = dir_info["contents"][subdir]
+                subdir_path = relative_path + "/" + subdir
+                dirs_to_visit.append((subdir_info, subdir_path))
+
+
 __all__ = [
     "format_disk_image",
     "create_directory",
@@ -301,7 +369,8 @@ __all__ = [
     "exists",
     "get_root",
     "list_contents",
-    "extend_disk_image"
+    "extend_disk_image",
+    "walk"
 ]
 
 # Example usage

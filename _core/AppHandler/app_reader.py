@@ -158,7 +158,8 @@ class AppRunner:
                 if cmd[1].startswith("/"):
                     data = Disk.read_data_from_disk(os.path.basename(cmd[1]), os.path.dirname(cmd[1]))
                 else:
-                    data = Disk.read_data_from_disk(cmd[1], self.cwd)
+                    path = cmd[1].split("/")[:-1]
+                    data = Disk.read_data_from_disk(cmd[1].split("/")[-1], os.path.join(self.cwd, "/".join(path)))
                 if not data:
                     raise FileNotFoundError(f"Could not find python file: '{cmd[1]}'")
                 exec(data, {'__name__': '__main__', 'GUI': GUI, 'user': user})
@@ -187,13 +188,14 @@ class AppReader:
         resources = files + 'Resources/'
         Disk.list_contents(files)
         data = Disk.read_data_from_disk("Info.prop", files)
-        print(data)
+        print(data.decode("utf-8"))
         data = json.loads(data)
         if not isinstance(data, dict):
             raise TypeError("Info.prop is not dict styled.")
         if "image" in data.keys():
             image = data["image"]
             img_data = Disk.read_data_from_disk(image, resources)
+            print(img_data)
             if img_data:
                 fake_file = io.BytesIO(GlobalUtils.svgToPng(img_data, 2))
                 image = pygame.image.load(fake_file)
@@ -206,7 +208,7 @@ class AppReader:
         exe_code = Disk.read_data_from_disk(os.path.basename(self.exe), self.files + 'Executable').decode("utf-8")
         if not exe_code:
             raise FileNotFoundError("Executable not found")
-        app = AppRunner(exe_code, self.files + "Executable", self.mode)
+        app = AppRunner(exe_code, self.files, self.mode)
         app.run(log_file=self.log_file)
 
 
@@ -214,9 +216,9 @@ def main() -> None:
     Disk.load()
     app = AppRunner(r"""!8-bit-code
 
-0x10 terminal-main.py
+0x10 Resources/terminal-main.py
 0x06
-""", "/Applications/Terminal.neap/Files/Resources")
+""", "/Applications/Terminal.neap/Files/")
     app.run()
 
 if __name__ == "__main__":

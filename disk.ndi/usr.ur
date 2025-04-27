@@ -1,11 +1,11 @@
 {
     "users": {
         "root": {
-            "password": "$2b$12$2uTDxjKvJMmqFbvX1cKjeubNcCybrPcMJtyV.pSWZCmAh74mjeftS",
+            "password": "$2b$12$2ZjsprGhJrLRUwIlRUrcC.fHCkPZE56Rfh3yfQljSsHnJdCzK5hAa",
             "home": "/Users/root"
         },
         "Ayaan": {
-            "password": "$2b$12$jc68X73rjaHRSXSQb5z2IOMHrkag0lUT1sBgbG2gcMbSmCzLRu.6G",
+            "password": "$2b$12$PXoxRRoSm.U/Bj5eZS6pYeMDqrdIKGHHIWmWzwXBeEvovAYaACX6e",
             "home": "/Users/Ayaan"
         }
     }

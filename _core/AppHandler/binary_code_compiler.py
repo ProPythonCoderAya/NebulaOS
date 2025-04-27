@@ -2,6 +2,7 @@ import os
 from _core.AppHandler import opcode_map, reversed_opcode_map, Compile, AppReader, AppRunner
 from _core import Disk
 import datetime
+from io import BytesIO
 
 
 class BinaryCompile:
@@ -26,8 +27,11 @@ class BinaryCompile:
     def to_bytes(self):
         return b"NSB" + (1).to_bytes(2, "big") + self.total_instructions.to_bytes(2, "big") + self.compiled_binary
 
-    def save(self, path):
-        with open(path, "wb") as f:
+    def save_to(self, f: BytesIO | str):
+        if isinstance(f, str):
+            with open(f, "wb") as f:
+                f.write(self.to_bytes())
+        elif isinstance(f, BytesIO):
             f.write(self.to_bytes())
 
     @staticmethod
@@ -79,7 +83,8 @@ def main() -> None:
         PRINT -A \r0
         HALT
     """)
-    binary.save("example.nsb")
+    with open("example.nsb", "wb") as f:
+        binary.save_to(f)
 
     # Later...
     code = BinaryCompile.load("example.nsb", readable_by_AppReader=True)

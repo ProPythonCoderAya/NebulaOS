@@ -92,11 +92,26 @@ def install_package(package):
         error = 0
         if not Disk.exists(f"/Applications/{package}.neap"):
             Disk.create_directory(f"/Applications/{package}.neap")
+        else:
+            for root, dirs, files in Disk.walk(f"/Applications/{package}.neap", topdown=False):
+                print(root, dirs, files)
+                # Delete files
+                for file in files:
+                    Disk.delete_file(file, root)
+
+                # Delete directories
+                for dir in dirs:
+                    dir_path = os.path.join(root, dir)
+                    Disk.delete_directory(dir_path)
+            Disk.list_contents()
         for root, dirs, files in os.walk(dist):
-            print(root, dirs, files)
             for dir in dirs:
-                if not Disk.exists(dir):
-                    Disk.create_directory(dir)
+                dir_path = os.path.join(root, dir)
+                relative_path = os.path.relpath(dir_path, dist)
+                target_path = os.path.join("/Applications", relative_path)
+                if not Disk.exists(target_path):
+                    Disk.create_directory(target_path)
+
             for file in files:
                 file_path = os.path.join(root, file)
                 relative_path = os.path.relpath(file_path, dist)
@@ -106,7 +121,7 @@ def install_package(package):
                 with open(file_path, "rb") as f:
                     file_data = f.read()
 
-                # Tell the user that it is writing to the disk.nam
+                # Tell the user that it is writing to the disk.
                 print(f"Writing '{file}' to disk...")
 
                 # Write the file data to the virtual disk
@@ -121,12 +136,12 @@ def install_package(package):
                 # Delete files
                 for file in files:
                     file_path = os.path.join(root, file)
-                    os.remove(file_path)  # Remove the file
+                    #os.remove(file_path)  # Remove the file
 
                 # Delete directories
                 for dir in dirs:
                     dir_path = os.path.join(root, dir)
-                    os.rmdir(dir_path)  # Remove the directory
+                    #os.rmdir(dir_path)  # Remove the directory
             return
         print(f"Could not install package '{package}'")
 
@@ -135,13 +150,13 @@ def install_package(package):
 
 
 if not os.path.exists(Disk.disk_name):
-    sys.stdout = open(os.devnull, "w")
+    #sys.stdout = open(os.devnull, "w")
     Disk.format_disk_image()
     Disk.create_directory("/Users")
     Disk.create_directory("/Users/root")
     Disk.create_directory("/Applications")
     install_package("Terminal")
-    sys.stdout = sys.__stdout__
+    #sys.stdout = sys.__stdout__
 else:
     Disk.load()
 
