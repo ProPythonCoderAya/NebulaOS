@@ -195,12 +195,14 @@ def get_password(prompt="Password: ", mask="•"):
                 print("\b \b", end="", flush=True)
         elif hasattr(key, 'char') and key.char:
             password.append(key.char)
-            time.sleep(0.05)  # Wait for keypress to register and get printed
+            time.sleep(0.07)  # Wait for keypress to register and get printed
             print("\b \b", end="", flush=True)  # Delete printed character
             print(mask, end="", flush=True)  # Replace with mask
 
     with keyboard.Listener(on_press=on_press) as listener:
         listener.join()
+
+    input()
 
     return ''.join(password)
 
@@ -470,30 +472,37 @@ def nebula_shell():
 
 
 def main() -> None:
-    logo = [
-        r"|\    |  ╔------  ╔------    |     |  |        ╔-----╗       ╔-----╗   /------ ",
-        r"| \   |  |        |       |  |     |  |        |     |       |     |  |        ",
-        r"|  \  |  |------  |------|   |     |  |        |_____|       |     |   \-----\ ",
-        r"|   \ |  |        |       |  |     |  |        |     |       |     |          |",
-        r"|    \|  ╚------  ╚------    ╚_____╝  ╚______  |     |       ╚_____╝   ______/ ",
-    ]
+    if sys.stdout.isatty() and sys.stderr.isatty() and sys.stdin.isatty():
+        logo = [
+            r"|\    |  ╔------  ╔------    |     |  |        ╔-----╗       ╔-----╗   /------ ",
+            r"| \   |  |        |       |  |     |  |        |     |       |     |  |        ",
+            r"|  \  |  |------  |------|   |     |  |        |_____|       |     |   \-----\ ",
+            r"|   \ |  |        |       |  |     |  |        |     |       |     |          |",
+            r"|    \|  ╚------  ╚------    ╚_____╝  ╚______  |     |       ╚_____╝   ______/ ",
+        ]
 
-    # 1. Print logo slowly
-    for line in logo:
-        for char in line:
-            print(char, end="", flush=True)
-            time.sleep(0.01)
-        print()
+        os.system("clear")
 
-    time.sleep(1)
+        # 1. Print logo slowly
+        for line in logo:
+            for char in line:
+                print(char, end="", flush=True)
+                time.sleep(0.01)
+            print()
 
-    # 2. Erase logo line-by-line
-    for _ in logo:
-        sys.stdout.write("\033[F")  # Move cursor up one line
-        sys.stdout.write("\r")  # Go to start of line
-        sys.stdout.write(" " * 120)  # Clear the line
-        sys.stdout.write("\r")  # Return again
-        sys.stdout.flush()
+        time.sleep(1)
+
+        # 2. Erase logo line-by-line
+        for i, line in enumerate(logo[::-1]):
+            sys.stdout.write("\033[F")  # move cursor up one line
+            length = len(line)
+            for _ in range(length):
+                line = line[:-1]
+                sys.stdout.write("\r" + line + " ")  # remove the last character
+                sys.stdout.flush()  # force the output to update
+                time.sleep(0.01)  # slow down erasing effect
+        os.system("clear")
+        time.sleep(1)
     try:
         with open(Disk.disk_name + "/settings.st") as file:
             data = json.load(file)
