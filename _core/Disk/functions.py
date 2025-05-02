@@ -282,7 +282,10 @@ def exists(path):
         else:
             return False
     else:
-        return True
+        if parts:
+            return True
+        else:
+            return False
 
 
 def get_root():
@@ -303,15 +306,11 @@ def walk(top="/", topdown=True):
             - dirnames: List of subdirectories in current directory (list of strings).
             - filenames: List of non-directory files in current directory (list of strings).
     """
-
     global superblock
-    # Ensure the `top` is in the correct format (strip leading slashes)
-    parts = top.strip("/").split("/") if top != "/" else []
 
-    # Start from the root directory
+    parts = top.strip("/").split("/") if top != "/" else []
     current = superblock["root"]
 
-    # Traverse the directories to reach the requested path
     for part in parts:
         if part in current["contents"] and current["contents"][part]["type"] == "dir":
             current = current["contents"][part]
@@ -319,41 +318,22 @@ def walk(top="/", topdown=True):
             print(f"Error: Directory '{top}' not found.")
             return
 
-    # Now we are at the requested directory, let's walk it
-    dirs_to_visit = [(current, "")]  # Initialize with the current directory, and the relative path
-    visited = set()  # To keep track of directories we've visited for bottom-up traversal
-
-    while dirs_to_visit:
-        dir_info, relative_path = dirs_to_visit.pop()
-
-        # Gather the subdirectories and files
+    def _walk(dir_info, rel_path):
         subdirs = [name for name, info in dir_info["contents"].items() if info["type"] == "dir"]
         files = [name for name, info in dir_info["contents"].items() if info["type"] == "file"]
 
-        # If topdown=True, we yield the current directory's info first
         if topdown:
-            yield relative_path, subdirs, files
+            yield rel_path, subdirs, files
 
-        # If topdown=False, we defer yielding until after subdirectories are processed
-        if not topdown and relative_path not in visited:
-            visited.add(relative_path)  # Mark this directory as visited
-            # Traverse subdirectories first
-            for subdir in subdirs:
-                subdir_info = dir_info["contents"][subdir]
-                subdir_path = relative_path + "/" + subdir
-                dirs_to_visit.append((subdir_info, subdir_path))
+        for subdir in subdirs:
+            subdir_info = dir_info["contents"][subdir]
+            sub_path = f"{rel_path}/{subdir}" if rel_path else subdir
+            yield from _walk(subdir_info, sub_path)
 
-        # Yield the current directory's information after visiting subdirectories (bottom-up)
-        if not topdown and relative_path not in visited:
-            visited.add(relative_path)  # Mark this directory as visited
-            yield relative_path, subdirs, files
+        if not topdown:
+            yield rel_path, subdirs, files
 
-        # Traverse subdirectories if topdown=True
-        if topdown:
-            for subdir in subdirs:
-                subdir_info = dir_info["contents"][subdir]
-                subdir_path = relative_path + "/" + subdir
-                dirs_to_visit.append((subdir_info, subdir_path))
+    yield from _walk(current, "" if top == "/" else top.strip("/"))
 
 
 __all__ = [

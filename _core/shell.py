@@ -103,7 +103,7 @@ def install_package(package):
                 for dir in dirs:
                     dir_path = os.path.join(root, dir)
                     Disk.delete_directory(dir_path)
-            Disk.list_contents()
+            Disk.list_contents("")
         for root, dirs, files in os.walk(dist):
             for dir in dirs:
                 dir_path = os.path.join(root, dir)
@@ -136,12 +136,12 @@ def install_package(package):
                 # Delete files
                 for file in files:
                     file_path = os.path.join(root, file)
-                    #os.remove(file_path)  # Remove the file
+                    os.remove(file_path)  # Remove the file
 
                 # Delete directories
                 for dir in dirs:
                     dir_path = os.path.join(root, dir)
-                    #os.rmdir(dir_path)  # Remove the directory
+                    os.rmdir(dir_path)  # Remove the directory
             return
         print(f"Could not install package '{package}'")
 
@@ -150,13 +150,13 @@ def install_package(package):
 
 
 if not os.path.exists(Disk.disk_name):
-    #sys.stdout = open(os.devnull, "w")
+    sys.stdout = open(os.devnull, "w")
     Disk.format_disk_image()
     Disk.create_directory("/Users")
     Disk.create_directory("/Users/root")
     Disk.create_directory("/Applications")
     install_package("Terminal")
-    #sys.stdout = sys.__stdout__
+    sys.stdout = sys.__stdout__
 else:
     Disk.load()
 
