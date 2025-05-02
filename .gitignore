@@ -15,3 +15,6 @@ __pycache__/
 # Temporary files
 *.tmp
 *.swp
+
+# Test folders and files
+tests
