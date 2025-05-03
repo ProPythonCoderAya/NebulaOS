@@ -19,7 +19,14 @@ Support for Windows and Linux may come in the future, but it is not available at
 
 2. **Install Required Packages**:
    - Ensure you have Python installed on your machine.
-   - Open the extracted folder and follow the instructions in the `Installation.txt` file to install the necessary Python packages. If you want you can run `install.sh` and it will do everything for you.
+   - Open the extracted folder and follow the instructions in the `Installation.txt` file to install the necessary Python packages.
+   - If you do not want to follow `Installation.txt` you can navigate to the folder where you cloned or downloaded NebulaOS and run `install.sh`
+
+### Running NebulaOS
+After installing and activating the virtual environment, run:
+```bash
+python3 _core/shell.py
+```
 
 #### Note:
 - Since NebulaOS is written in Python, it is not intended to be installed on a physical machine just yet. It runs within a Python environment.

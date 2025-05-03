@@ -17,6 +17,13 @@ env/
 # macOS system files
 .DS_Store
 
+# Files that will be used later
+app_imgs
+temp.py
+
+# Files used for GitHub
+push.py
+
 # Logs and temp files
 *.log
 *.tmp
