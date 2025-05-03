@@ -1,20 +1,44 @@
-# Byte-compiled files
+# Python bytecode
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
+*$py.class
 
-# PyCharm files
+# Virtual environments (catch nested or top-level)
+.venv/
+venv/
+ENV/
+env/
+**/env/
+**/venv/
+
+# PyCharm
 .idea/
 
-# MacOS system files
+# macOS system files
 .DS_Store
 
-# Logs
+# Logs and temp files
 *.log
-
-# Temporary files
 *.tmp
 *.swp
+*.swo
 
-# Test folders and files
-tests
+# Test artifacts
+tests/
+coverage.*
+htmlcov/
+.tox/
+nosetests.xml
+pytest_cache/
+.cache/
+*.cover
+*.egg
+*.egg-info/
+dist/
+build/
+
+# VSCode settings
+.vscode/
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
