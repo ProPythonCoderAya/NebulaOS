@@ -27,6 +27,8 @@ After installing and activating the virtual environment, run:
 ```bash
 python3 _core/shell.py
 ```
+You will be prompted for a username, enter `root`.
+The default password for root is `password`
 
 #### Note:
 - Since NebulaOS is written in Python, it is not intended to be installed on a physical machine just yet. It runs within a Python environment.

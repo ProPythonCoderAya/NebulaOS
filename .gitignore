@@ -24,6 +24,9 @@ temp.py
 # Files used for GitHub
 push.py
 
+# Fake Disks
+disk.ndi
+
 # Logs and temp files
 *.log
 *.tmp
