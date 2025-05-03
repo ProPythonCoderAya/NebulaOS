@@ -7,6 +7,7 @@ def run_git_command(command):
     if result.returncode != 0:
         print(f"Error: {result.stderr}")
         return False
+    print(result.stdout)
     return True
 
 # Get commit message
