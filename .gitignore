@@ -17,9 +17,9 @@ env/
 # macOS system files
 .DS_Store
 
-# Files that will be used later
+# Unessesary
 app_imgs
-temp.py
+get_req.py
 
 # Files used for GitHub
 push.py
@@ -46,6 +46,7 @@ pytest_cache/
 *.egg-info/
 dist/
 build/
+temp.py
 
 # VSCode settings
 .vscode/

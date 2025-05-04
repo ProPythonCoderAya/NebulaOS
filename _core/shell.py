@@ -210,7 +210,7 @@ def get_password(prompt="Password: ", mask="•"):
                 print("\b \b", end="", flush=True)
         elif hasattr(key, 'char') and key.char:
             password.append(key.char)
-            time.sleep(0.07)  # Wait for keypress to register and get printed
+            time.sleep(0.07)  # Wait for the keypress to register and get printed
             print("\b \b", end="", flush=True)  # Delete printed character
             print(mask, end="", flush=True)  # Replace with mask
 

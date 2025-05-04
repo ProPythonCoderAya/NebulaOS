@@ -19,5 +19,5 @@
 
 4. Install the required packages:
    ```bash
-   pip install bcrypt pygame requests pynput
+   pip install -r requirements.txt
    ```
