@@ -19,11 +19,6 @@ Support for Windows and Linux may come in the future, but it is not available at
 
 2. **Install Required Packages**:
     - Ensure you have Python installed on your machine.
-    - Set up a virtual environment:
-      ```bash
-      python3 -m venv .venv
-      source .venv/bin/activate  # macOS
-      ```
     - Open the extracted folder and follow the instructions in the [`Installation.md`](Installation.md) file to install the necessary Python packages.
     - If you do not want to follow `Installation.md`, you can navigate to the folder where you cloned or downloaded NebulaOS and run [`install.sh`](install.sh).
 
