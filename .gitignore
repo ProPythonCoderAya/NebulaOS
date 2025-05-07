@@ -21,6 +21,7 @@ env/
 # Unessesary
 app_imgs
 get_req.py
+generate_icon.py
 
 # Files used for GitHub
 push.py
