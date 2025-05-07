@@ -4,7 +4,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Virtual environments (catch nested or top-level)
+# Virtual environments (catch nested and top-level)
 .venv/
 venv/
 ENV/
