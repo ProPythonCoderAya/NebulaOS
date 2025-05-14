@@ -13,6 +13,6 @@ if [[ "$py_ver" < "3.10" ]]; then
     fi
 fi
 
-python3 -m mk_venv .venv
+python3 -m mk_venv --prompt "NebulaOS" .venv
 source .venv/bin/activate
 pip install -r requirements.txt

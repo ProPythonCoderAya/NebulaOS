@@ -9,7 +9,7 @@
 
 2. Create a virtual environment using the included custom module:
    ```bash
-   python3 -m mk_venv .venv
+   python3 -m mk_venv --prompt "NebulaOS" .venv
    ```
 
 3. Activate the virtual environment:

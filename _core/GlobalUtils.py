@@ -29,7 +29,7 @@ def draw_rounded_rect(surface, color, rect, radius, alpha, *args):
     # Create a temporary surface with per-pixel alpha
     temp_surface = pygame.Surface((rect[2], rect[3]), pygame.SRCALPHA)
 
-    # Fill it with a wierd color
+    # Fill it with a unique color
     temp_surface.fill((110, 75, 58))
 
     # Draw the rounded rectangle in the desired color
