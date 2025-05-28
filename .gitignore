@@ -48,7 +48,7 @@ pytest_cache/
 *.egg-info/
 dist/
 build/
-temp.py
+_core/temp.py
 
 # VSCode settings
 .vscode/

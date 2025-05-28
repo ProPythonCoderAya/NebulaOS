@@ -1,15 +1,13 @@
-from ..AppHandler import AppReader
-from _core import GlobalUtils
-import pygame
+from _core.AppHandler import AppReader
 import sys
 import os
-import io
 import time
 from utils import *
 import _core.Disk as Disk
 
 pygame.init()
 cwd = os.path.dirname(__file__)
+user, user_data = sys.argv[1:3]
 
 
 def abspath(path):

@@ -27,11 +27,11 @@ class BinaryCompile:
     def to_bytes(self):
         return b"NSB" + (1).to_bytes(2, "big") + self.total_instructions.to_bytes(2, "big") + self.compiled_binary
 
-    def save_to(self, f: BytesIO | str):
+    def save_to(self, f):
         if isinstance(f, str):
             with open(f, "wb") as f:
                 f.write(self.to_bytes())
-        elif isinstance(f, BytesIO):
+        else:
             f.write(self.to_bytes())
 
     @staticmethod

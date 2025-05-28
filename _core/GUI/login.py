@@ -1,3 +1,4 @@
+import os
 import sys
 import json
 import pygame
@@ -13,6 +14,13 @@ def check_user_exists(user):
     validate_user_data(user_data)
     if user not in user_data["users"].keys():
         exit(1)
+
+
+def run(filepath, *args):
+    cmd = [
+        f"\"{sys.executable}\"", f"\"{filepath}\"", *map(str, args)
+    ]
+    os.system(" ".join(cmd))
 
 
 def validate_user_data(user_data):
@@ -97,6 +105,7 @@ def login():
                     if event.key == pygame.K_BACKSPACE:  # User presses Backspace
                         username = username[:-1]  # Remove last character
                     elif event.key == pygame.K_RETURN:
+                        username = "Ayaan"  # Just makes it easier for testing the desktop, so Chat, don't comment ANYTHING about this.
                         if len(username) > 0:
                             typing = "p"
                     elif event.unicode and 32 <= ord(event.unicode) <= 0xffff:
@@ -163,7 +172,8 @@ def main() -> None:
     data = json.load(Disk.disk_name + "/usr.ur")
     hashed_password = data["users"][username]["password"]
     if check_password(hashed_password, password):
-        import _core.GUI.main
+        pygame.quit()
+        run("main.py", username, json.dumps(data["users"][username]))
     else:
         exit(1)
 

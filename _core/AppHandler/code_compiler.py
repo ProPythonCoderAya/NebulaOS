@@ -94,9 +94,11 @@ class Compile:
 def main() -> None:
     code = Compile(r"""
     start:
-        JUMP 0x02
-        JUMP start
-        awd awd
+        LOAD r0 0x05
+        LOAD r1 0x03
+        
+        ADD r0 r1 r2
+        PRINT \r2
     """).get_output()
     print(code)
 

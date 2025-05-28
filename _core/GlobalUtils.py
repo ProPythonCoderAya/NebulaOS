@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 import cairosvg
 import pygame
+import math
 
 
 def svgToPng(data: bytes, scale: int | float) -> bytes:
@@ -45,6 +46,18 @@ def draw_rounded_rect(surface, color, rect, radius, alpha, *args):
 
 def draw_rect(surface, color, rect, br=-1, brtl=-1, brtr=-1, brbl=-1, brbr=-1):
     pygame.draw.rect(surface=surface, color=color, rect=rect, width=0, border_radius=br, border_top_left_radius=brtl, border_top_right_radius=brtr, border_bottom_left_radius=brbl, border_bottom_right_radius=brbr)
+
+
+def distance(x1, y1, x2, y2):
+    return math.dist((x1, y1), (x2, y2))
+
+
+def sum_list(a, b):
+    length = max(len(l) for l in (a, b))
+    sum_list = []
+    for i in range(length):
+        sum_list.append(a[i] + b[i])
+    return sum_list
 
 
 __all__ = [

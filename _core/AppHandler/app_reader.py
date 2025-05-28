@@ -5,7 +5,7 @@ import sys
 import pygame
 from typing import Literal
 from _core import Disk, GlobalUtils
-from _core.AppHandler import GUI
+sys.path.append("..")
 
 
 class AppRunner:
@@ -85,6 +85,8 @@ class AppRunner:
                 new_message = message.split()
                 message = ""
                 for word in new_message:
+                    if word.startswith("0x"):
+                        word = str(int(word, 16))
                     if print_ascii and word.isnumeric():
                         word = chr(int(word))
                     message += word + " "
@@ -162,7 +164,12 @@ class AppRunner:
                     data = Disk.read_data_from_disk(cmd[1].split("/")[-1], os.path.join(self.cwd, "/".join(path)))
                 if not data:
                     raise FileNotFoundError(f"Could not find python file: '{cmd[1]}'")
-                exec(data, {'__name__': '__main__', 'GUI': GUI, 'user': user})
+                with open(Disk.disk_name + "/usr.ur") as user_data:
+                    user_data = json.load(user_data)
+                    user_data = user_data["users"][user]
+                    user_data = json.dumps(user_data)
+                    sys.argv = ["", user, user_data]
+                exec(data)
             else:
                 raise self.InvalidInstructionError(f"Unknown instruction '{cmd[0]}'.")
             pc += 1
@@ -186,16 +193,13 @@ class AppReader:
     def get_image(app_path):
         files = app_path + '/Files/'
         resources = files + 'Resources/'
-        Disk.list_contents(files)
         data = Disk.read_data_from_disk("Info.prop", files)
-        print(data.decode("utf-8"))
         data = json.loads(data)
         if not isinstance(data, dict):
             raise TypeError("Info.prop is not dict styled.")
         if "image" in data.keys():
             image = data["image"]
             img_data = Disk.read_data_from_disk(image, resources)
-            print(img_data)
             if img_data:
                 fake_file = io.BytesIO(GlobalUtils.svgToPng(img_data, 2))
                 image = pygame.image.load(fake_file)
@@ -216,7 +220,10 @@ def main() -> None:
     Disk.load()
     app = AppRunner(r"""!8-bit-code
 
-0x10 Resources/terminal-main.py
+0x01 r0 0x05
+0x01 r1 0x03
+0x03 r0 r1 r2
+0x05 \r2
 0x06
 """, "/Applications/Terminal.neap/Files/")
     app.run()
