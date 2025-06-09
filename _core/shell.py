@@ -1,7 +1,7 @@
 import builtins
-import os
-import io
 import sys
+import io
+import os
 import time
 import json
 import Disk
@@ -9,6 +9,7 @@ import bcrypt
 import zipfile
 import platform
 import requests
+import AppHandler
 from pynput import keyboard
 
 
@@ -39,7 +40,7 @@ def generate_help_text():
         "mode <mode>": "Changes the mode. Example: mode GUI",
         "addusr <name> <passwd>": "Adds a user (must be root to add user)",
         "setmode <key> <value>": "Sets the key to value in the settings",
-        "cmdadd <cmd>": "Makes a custom command (type :wcmd to save)",
+        "addcmd <cmd>": "Makes a custom command",
         "nam <option> [package]": "Installs, lists, etc all the Nebula Apps",
         "shutdown": "Shut down NebulaOS"
     }
@@ -265,10 +266,26 @@ def nebula_shell():
                 break
 
 
+def expand_vars(cmd_str, user, user_data):
+    home = user_data.get("home", f"/Users/{user}")
+    variables = {
+        "$USER": user,
+        "$HOME": home,
+        "$MODE": user_data.get("mode", "shell"),
+        "$PWD": user_data.get("path", "/"),
+    }
+    for key, val in variables.items():
+        cmd_str = cmd_str.replace(key, val)
+    return cmd_str
+
+
 def parse_cmd(cmd, current_path, user, user_data, mode, input_func=builtins.input):
     global command_text, input
-    cmd = cmd.strip().split()
     input = input_func
+
+    # Join back to a string, expand vars, then split again
+    raw_cmd = ' '.join(cmd) if isinstance(cmd, list) else cmd
+    cmd = expand_vars(raw_cmd, user, user_data).strip().split()
 
     if not cmd:
         return
@@ -359,8 +376,7 @@ def parse_cmd(cmd, current_path, user, user_data, mode, input_func=builtins.inpu
             print("Usage: mode <mode>")
             return
         if cmd[1] == "GUI" and cmd[1] != mode:
-            base = os.path.expanduser("~/NebulaOS")
-            run(os.path.join(base, "_core/GUI/main.py"), user, user_data)
+            run("GUI/main.py")
             return -1
         else:
             print(f"Already in {mode} mode")
@@ -464,6 +480,30 @@ def parse_cmd(cmd, current_path, user, user_data, mode, input_func=builtins.inpu
 
         print(f"Added command '{cmd_name}' successfully!")
         command_text = generate_help_text()
+
+    elif cmd[0] == "whoami":
+        print(user)
+
+    elif cmd[0] == "run":
+        args = cmd[1:]
+        if len(args) < 1:
+            print("Usage: run <app>")
+            return
+
+        name = args[0]
+
+        if not name.endswith(".neap"):
+            print("Only Nebula Applications can be run.")
+            return
+
+        path = os.path.join("/Applications", name)
+
+        if not Disk.exists(path):
+            print("Application not found.")
+            return
+
+        app = AppHandler.AppReader(path)
+        app.run()
 
     elif cmd[0] == "nam":
         args = cmd[1:]

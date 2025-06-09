@@ -1,0 +1,3 @@
+#!/bin/bash
+cd "$(dirname "$0")/../Resources" || exit 1
+./NebulaOS/.venv/bin/python3 boot.py
