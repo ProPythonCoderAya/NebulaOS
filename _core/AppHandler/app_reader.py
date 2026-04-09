@@ -169,6 +169,7 @@ class AppRunner:
                     user_data = user_data["users"][user]
                     user_data = json.dumps(user_data)
                     sys.argv = ["", user, user_data]
+                sys.path.append(os.path.dirname(os.path.dirname(__file__)))
                 exec(data)
             else:
                 raise self.InvalidInstructionError(f"Unknown instruction '{cmd[0]}'.")

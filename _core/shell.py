@@ -4,13 +4,12 @@ import io
 import os
 import time
 import json
-import Disk
 import bcrypt
 import zipfile
 import platform
 import requests
-import AppHandler
 from pynput import keyboard
+from _core import Disk, AppHandler
 
 
 def run(filepath, *args):
@@ -247,7 +246,7 @@ def nebula_shell():
     sign = "#" if user == "root" else "$"
     user_home = user_data["home"]
     current_path = user_home
-    print("Welcome to NebulaOS Restart 🚀")
+    print("Welcome to NebulaOS Restart")
     print("Type 'help' for commands.\n")
 
     while True:
@@ -331,7 +330,7 @@ def parse_cmd(cmd, current_path, user, user_data, mode, input_func=builtins.inpu
         content = Disk.read_data_from_disk(file_name, current_path)
         if content is None:
             print("Creating file...")
-            content = ""
+            content = b""
 
         print(f"Opening '{file_name}'. Type ':wq' to save and quit.")
         if content:
@@ -375,11 +374,17 @@ def parse_cmd(cmd, current_path, user, user_data, mode, input_func=builtins.inpu
         if len(cmd) < 2:
             print("Usage: mode <mode>")
             return
-        if cmd[1] == "GUI" and cmd[1] != mode:
-            run("GUI/main.py")
-            return -1
-        else:
+        wanted_mode = cmd[1].upper()
+        if wanted_mode == mode:
             print(f"Already in {mode} mode")
+            return
+        if wanted_mode == "GUI":
+            run("GUI/main.py", user, user_data)
+            return -1
+        elif wanted_mode == "SHELL":
+            return "hello"
+        else:
+            print(f"Unknown mode: {wanted_mode}, available modes: GUI, Shell. Not case-sensitive")
 
     elif cmd[0] == "save":
         print("Saving...")
@@ -585,7 +590,7 @@ def main() -> None:
                 elif mode == "shell":
                     nebula_shell()
                 else:
-                    print(f"Unknown boot type {mode}, available boot types: GUI, Shell. Not case-sensitive")
+                    print(f"Unknown mode: '{mode}', available modes: GUI, Shell. Not case-sensitive")
                     print("Choosing default, which is shell.")
                     nebula_shell()
             else:

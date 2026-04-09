@@ -58,3 +58,7 @@ _core/temp.py
 
 # Jupyter notebooks checkpoints
 .ipynb_checkpoints/
+
+# Packages
+
+NebulaOS Packages/

@@ -5,12 +5,15 @@ from _core import GlobalUtils
 class Window(pygame.Surface):
     def __init__(self, title, size, pos=(0, 0), font="Courier New", font_size=16):
         # Initialize as a pygame Surface
-        pygame.init()
+        if not pygame.get_init():
+            pygame.init()
         super().__init__(size, pygame.SRCALPHA)
 
         self._drag_offset = None
         self._rect = self.get_rect(topleft=pos)
         self._title = title
+        self._font = font
+        self._fontsize = font_size
         self._bar_height = 30
         self._dragging = False
         self.green = (self.get_width() - 10, 15)

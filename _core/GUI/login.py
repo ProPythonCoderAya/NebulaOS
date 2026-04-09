@@ -169,11 +169,12 @@ def login():
 def main() -> None:
     username, password = login()
     check_user_exists(username)
-    data = json.load(Disk.disk_name + "/usr.ur")
+    with open(Disk.disk_name + "/usr.ur") as f:
+        data = json.load(f)
     hashed_password = data["users"][username]["password"]
     if check_password(hashed_password, password):
         pygame.quit()
-        run("main.py", username, json.dumps(data["users"][username]))
+        run("GUI/main.py", username, json.dumps(data["users"][username]))
     else:
         exit(1)
 

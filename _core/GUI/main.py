@@ -1,4 +1,5 @@
 from _core.AppHandler import AppReader
+import threading
 import sys
 import os
 import time
@@ -47,6 +48,10 @@ for name, info in current["contents"].items():
     if info["type"] == "dir" and name.endswith(".neap"):
         apps[name] = info
 
+# Global variables used for communicating through exec
+_Window_NebulaOS_Main_GUI_windows = []
+requests = []
+
 # Fonts
 font_big = pygame.font.SysFont("Courier New", 48)
 font_small = pygame.font.SysFont("Courier New", 24)
@@ -87,8 +92,12 @@ def draw(pos):
             cursor = "Hand"
             if pygame.mouse.get_pressed()[0]:
                 cursor = "Drag"
+
                 app = AppReader(app_path)
                 app.run()
+
+    for w in _Window_NebulaOS_Main_GUI_windows:
+        print(w)
 
     # Clock
     current_time = time.strftime("%H:%M")
@@ -120,53 +129,63 @@ def draw(pos):
     WIN.blit(cursors[cursor], (mouse_pos[0] - mouse_offset, mouse_pos[1] - 5))
 
 
-start.play()
-# Fade the screen
-pos = 0, 0
-for alpha in range(255, 0, -5):
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            Disk.save()
-            pygame.quit()
-            sys.exit()
-        elif event.type == pygame.VIDEORESIZE:
-            background = pygame.transform.smoothscale(pygame.image.load(abspath('Textures/Nebula.png')).convert_alpha(),
-                                                      (event.w, event.h))
-            WIDTH, HEIGHT = event.w, event.h
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            pos = event.pos
-    fade_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-    fade_surface.fill(BLACK)
-    fade_surface.set_alpha(alpha)
-    WIN.blit(background, (0, 0))
-    draw(pos)
-    WIN.blit(fade_surface, (0, 0))
-    pygame.display.update()
-    clock.tick(30)
+def main():
+    global background, WIDTH, HEIGHT
 
-# Main loop
-running = True
-pygame.mouse.set_visible(0)
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.VIDEORESIZE:
-            background = pygame.transform.smoothscale(pygame.image.load(abspath('Textures/Nebula.png')).convert_alpha(),
-                                                      (event.w, event.h))
-            WIDTH, HEIGHT = event.w, event.h
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            pos = event.pos
+    pygame.mouse.set_visible(0)
+    start.play()
+    # Fade the screen
+    pos = 0, 0
+    for alpha in range(255, 0, -5):
+        _Window_NebulaOS_Main_GUI_events = pygame.event.get()
+        for event in _Window_NebulaOS_Main_GUI_events:
+            if event.type == pygame.QUIT:
+                Disk.save()
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.VIDEORESIZE:
+                background = pygame.transform.smoothscale(
+                    pygame.image.load(abspath('Textures/Nebula.png')).convert_alpha(),
+                    (event.w, event.h))
+                WIDTH, HEIGHT = event.w, event.h
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                pos = event.pos
+        fade_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+        fade_surface.fill(BLACK)
+        fade_surface.set_alpha(alpha)
+        WIN.blit(background, (0, 0))
+        draw(pos)
+        WIN.blit(fade_surface, (0, 0))
+        pygame.display.update()
+        clock.tick(30)
 
-    # Background
-    WIN.blit(background, (0, 0))
+    # Main loop
+    running = True
+    while running:
+        _Window_NebulaOS_Main_GUI_events = pygame.event.get()
+        for event in _Window_NebulaOS_Main_GUI_events:
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.VIDEORESIZE:
+                background = pygame.transform.smoothscale(
+                    pygame.image.load(abspath('Textures/Nebula.png')).convert_alpha(),
+                    (event.w, event.h))
+                WIDTH, HEIGHT = event.w, event.h
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                pos = event.pos
 
-    # Draw the rest
-    draw(pos)
+        # Background
+        WIN.blit(background, (0, 0))
 
-    pygame.display.update()
-    clock.tick(60)
+        # Draw the rest
+        draw(pos)
 
-Disk.save()
-pygame.quit()
-sys.exit()
+        pygame.display.update()
+        clock.tick(60)
+
+    Disk.save()
+    pygame.quit()
+    sys.exit()
+
+if __name__ == '__main__':
+    main()
